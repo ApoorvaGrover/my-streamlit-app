@@ -100,7 +100,7 @@ if uploaded_file is not None:
         st.subheader("Model Performance")
         st.write(f"MAE: {mae:.3f}")
         st.write(f"RMSE: {rmse:.3f}")
-         st.write(f"R2 Score: {r2:.3f}")
+        st.write(f"R2 Score: {r2:.3f}")
 
 # 🔥 ADD THIS BLOCK HERE
      if r2 > 0.9:
