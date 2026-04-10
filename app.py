@@ -1,3 +1,9 @@
+standard_bandgap = {
+    "Si": 1.12,
+    "Ge": 0.66,
+    "GaAs": 1.42,
+    "AlN": 6.2
+}
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -91,6 +97,18 @@ if uploaded_file is not None:
         st.write(f"MAE: {mae:.3f}")
         st.write(f"RMSE: {rmse:.3f}")
         st.write(f"R2 Score: {r2:.3f}")
+        st.subheader("Model Performance")
+        st.write(f"MAE: {mae:.3f}")
+        st.write(f"RMSE: {rmse:.3f}")
+         st.write(f"R2 Score: {r2:.3f}")
+
+# 🔥 ADD THIS BLOCK HERE
+     if r2 > 0.9:
+    st.success("Model is highly reliable (Excellent fit)")
+    elif r2 > 0.75:
+    st.info("Model has good predictive power")
+else:
+    st.warning("Model performance needs improvement")
 
         # ===============================
         # Prediction section
@@ -100,7 +118,58 @@ if uploaded_file is not None:
         formula_input = st.text_input("Enter formula (e.g., SiO2)")
 
         if st.button("Predict"):
-            feat = np.array(featurize_formula(formula_input)).reshape(1, -1)
-            prediction = model.predict(feat)[0]
+    feat = np.array(featurize_formula(formula_input)).reshape(1, -1)
+    prediction = model.predict(feat)[0]
 
-            st.success(f"Predicted Band Gap: {prediction:.3f} eV")
+    st.subheader("Prediction Results")
+
+    # -----------------------------
+    # Predicted value
+    # -----------------------------
+    st.write(f"Predicted Band Gap: {prediction:.3f} eV")
+
+    # -----------------------------
+    # Extract main material (for lookup)
+    # -----------------------------
+    material_key = re.findall(r'[A-Z][a-z]?', formula_input)
+    material_key = material_key[0] if material_key else None
+
+    # -----------------------------
+    # Standard value + comparison
+    # -----------------------------
+    if material_key in standard_bandgap:
+        actual = standard_bandgap[material_key]
+        error = abs(actual - prediction)
+
+        st.write(f"Standard Band Gap: {actual} eV")
+        st.write(f"Error: {error:.3f}")
+
+        # -----------------------------
+        # Conclusion
+        # -----------------------------
+        if error < 0.1:
+            conclusion = "Excellent prediction"
+            st.success(conclusion)
+        elif error < 0.3:
+            conclusion = "Good prediction"
+            st.info(conclusion)
+        else:
+            conclusion = "Needs improvement"
+            st.warning(conclusion)
+
+        # -----------------------------
+        # FINAL TABLE (VERY IMPORTANT ⭐)
+        # -----------------------------
+        result_df = pd.DataFrame({
+            "Material": [material_key],
+            "Standard Bandgap (eV)": [actual],
+            "Predicted Bandgap (eV)": [prediction],
+            "Error": [error],
+            "Conclusion": [conclusion]
+        })
+
+        st.subheader("Final Comparison Table")
+        st.dataframe(result_df)
+
+    else:
+        st.warning("Standard bandgap not available for this material")
