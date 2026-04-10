@@ -103,7 +103,7 @@ if uploaded_file is not None:
         st.write(f"R2 Score: {r2:.3f}")
 
 # 🔥 ADD THIS BLOCK HERE
-     if r2 > 0.9:
+    if r2 > 0.9:
     st.success("Model is highly reliable (Excellent fit)")
     elif r2 > 0.75:
     st.info("Model has good predictive power")
